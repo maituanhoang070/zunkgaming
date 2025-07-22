@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codex AI - Tài Nguyên Sáng Tạo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 30px;
+        }
+
+        .mac-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28ca42; }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            margin: 0 20px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active, .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Search and Social */
+        .search-section {
+            margin-bottom: 30px;
+            padding: 0 30px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+            padding: 0 30px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Grid Layout */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            padding: 0 30px;
+        }
+
+        .resource-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(255, 255, 255, 0.1) 25%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(255, 255, 255, 0.1) 75%);
+            background-size: 20px 20px;
+            animation: shimmer 3s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .free {
+            color: #4ade80;
+        }
+
+        .comments {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Special card types */
+        .card-theme-1 { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+        .card-theme-2 { background: linear-gradient(135deg, #4834d4, #686de0); }
+        .card-theme-3 { background: linear-gradient(135deg, #00d2d3, #54a0ff); }
+        .card-theme-4 { background: linear-gradient(135deg, #5f27cd, #341f97); }
+        .card-theme-5 { background: linear-gradient(135deg, #ff9ff3, #f368e0); }
+        .card-theme-6 { background: linear-gradient(135deg, #3742fa, #2f3542); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-tabs {
+                margin: 0;
+                order: 1;
+            }
+
+            .auth-buttons {
+                order: 2;
+            }
+
+            .resource-grid {
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .filters {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Animation for cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .resource-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .resource-card:nth-child(1) { animation-delay: 0.1s; }
+        .resource-card:nth-child(2) { animation-delay: 0.2s; }
+        .resource-card:nth-child(3) { animation-delay: 0.3s; }
+        .resource-card:nth-child(4) { animation-delay: 0.4s; }
+        .resource-card:nth-child(5) { animation-delay: 0.5s; }
+        .resource-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header glass-effect">
+            <div class="mac-controls">
+                <div class="control-btn close"></div>
+                <div class="control-btn minimize"></div>
+                <div class="control-btn maximize"></div>
+            </div>
+            
+            <div class="nav-tabs">
+                <a href="#" class="nav-tab active">Trang chủ</a>
+                <a href="#" class="nav-tab">Đã mua</a>
+                <a href="#" class="nav-tab">Trang cá nhân</a>
+                <span style="color: white; margin-left: 20px;">Codex AI</span>
+            </div>
+            
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-outline">Đăng nhập</a>
+                <a href="#" class="btn btn-primary">Đăng ký</a>
+                <a href="#" class="btn btn-outline">Quên mật khẩu</a>
+            </div>
+        </header>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <input type="text" class="search-bar" placeholder="Tìm kiếm tài nguyên...">
+            
+            <div class="social-links">
+                <a href="#" class="social-link">
+                    <i class="fab fa-facebook"></i>
+                    Facebook
+                </a>
+                <a href="#" class="social-link">
+                    <i class="fab fa-tiktok"></i>
+                    Tiktok
+                </a>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Free</button>
+            <button class="filter-btn">Paid</button>
+            <button class="filter-btn">Tất cả danh mục <i class="fas fa-chevron-down"></i></button>
+        </div>
+
+        <!-- Resource Grid -->
+        <div class="resource-grid">
+            <!-- Card 1 - Thẻ -->
+            <div class="resource-card">
+                <div class="card-image card-theme-1">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                        <i class="fas fa-magic" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <div style="font-size: 18px; font-weight: bold;">MAGI-TECH</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat">
+                            <i class="fas fa-eye"></i>
+                            4.5k
+                        </div>
+                    </div>
+                    <h3 class="card-title">Thẻ</h3>
+                    <div class="card-meta">
+                        <span>Date: 2025-04-03</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price free">Miễn phí - Lượt tải: 175</div>
+                        <div class="comments">
+                            <i class="fas fa-comment"></i>
+                            1 Comments
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 - Trình phát nhạc -->
+            <div class="resource-card">
+                <div class="card-image card-theme-2">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                        <i class="fas fa-music" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <div style="font-size: 16px;">Music Player</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat">
+                            <i class="fas fa-eye"></i>
+                            5.1k
+                        </div>
+                    </div>
+                    <h3 class="card-title">Trình phát nhạc</h3>
+                    <div class="card-meta">
+                        <span>Date: 2025-04-01</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price free">Miễn phí - Lượt tải: 178</div>
+                        <div class="comments">
+                            <i class="fas fa-comment"></i>
+                            1 Comments
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 - Triển Lãm -->
+            <div class="resource-card">
+                <div class="card-image card-theme-3">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                        <i class="fas fa-palette" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <div style="font-size: 16px;">Art Gallery</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat">
+                            <i class="fas fa-eye"></i>
+                            26.6k
+                        </div>
+                    </div>
+                    <h3 class="card-title">Triển Lãm</h3>
+                    <div class="card-meta">
+                        <span>Date: 2025-03-31</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price">12.500 VNĐ - Đã mua: 12</div>
+                        <div class="comments">
+                            <i class="fas fa-comment"></i>
+                            0 Comments
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 - AI đơn giản -->
+            <div class="resource-card">
+                <div class="card-image card-theme-4">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                        <i class="fas fa-robot" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <div style="font-size: 16px;">AI Simple</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat">
+                            <i class="fas fa-eye"></i>
+                            5.5k
+                        </div>
+                    </div>
+                    <h3 class="card-title">AI đơn giản</h3>
+                    <div class="card-meta">
+                        <span>Date: 2025-03-26</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price">20.000 VNĐ - Đã mua: 10</div>
+                        <div class="comments">
+                            <i class="fas fa-comment"></i>
+                            0 Comments
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 - Portfolio -->
+            <div class="resource-card">
+                <div class="card-image card-theme-5">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                        <i class="fas fa-briefcase" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <div style="font-size: 16px;">Portfolio</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat">
+                            <i class="fas fa-eye"></i>
+                            4.1k
+                        </div>
+                    </div>
+                    <h3 class="card-title">Portfolio</h3>
+                    <div class="card-meta">
+                        <span>Date: 2025-03-23</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price">8.999 VNĐ - Đã mua: 4</div>
+                        <div class="comments">
+                            <i class="fas fa-comment"></i>
+                            0 Comments
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 - Con đường No AI -->
+            <div class="resource-card">
+                <div class="card-image card-theme-6">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                        <i class="fas fa-gamepad" style="font-size: 48px; margin-bottom: 10px;"></i>
+                        <div style="font-size: 16px;">Game Path</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-stats">
+                        <div class="stat">
+                            <i class="fas fa-eye"></i>
+                            2.5k
+                        </div>
+                    </div>
+                    <h3 class="card-title">Con đường No AI</h3>
+                    <div class="card-meta">
+                        <span>Date: 2025-03-20</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price">20.000 VNĐ - Đã mua: 7</div>
+                        <div class="comments">
+                            <i class="fas fa-comment"></i>
+                            0 Comments
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter functionality
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const resourceCards = document.querySelectorAll('.resource-card');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+
+                    const filter = this.textContent.trim().toLowerCase();
+                    
+                    resourceCards.forEach(card => {
+                        const priceElement = card.querySelector('.price');
+                        const isFree = priceElement && priceElement.textContent.includes('Miễn phí');
+                        const isPaid = priceElement && priceElement.textContent.includes('VNĐ');
+
+                        if (filter === 'all') {
+                            card.style.display = 'block';
+                        } else if (filter === 'free' && isFree) {
+                            card.style.display = 'block';
+                        } else if (filter === 'paid' && isPaid && !isFree) {
+                            card.style.display = 'block';
+                        } else if (filter !== 'all' && filter !== 'free' && filter !== 'paid') {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Search functionality
+            const searchBar = document.querySelector('.search-bar');
+            searchBar.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                resourceCards.forEach(card => {
+                    const title = card.querySelector('.card-title').textContent.toLowerCase();
+                    if (title.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // Card hover effects
+            resourceCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click functionality to cards
+            resourceCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const title = this.querySelector('.card-title').textContent;
+                    alert(`Đang mở: ${title}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
